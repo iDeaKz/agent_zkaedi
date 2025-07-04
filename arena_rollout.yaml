@@ -1,0 +1,483 @@
+# 🌀 Phase 4 - Argo Rollout Configuration
+# 10-step canary deployment with metric analysis for ScriptSynthCore
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: scriptsynthcore-arena
+  namespace: scriptsynthcore
+  labels:
+    app.kubernetes.io/name: scriptsynthcore
+    app.kubernetes.io/component: arena
+    app.kubernetes.io/part-of: scriptsynthcore
+    app.kubernetes.io/version: "4.0.0"
+  annotations:
+    rollout.argoproj.io/revision: "1"
+spec:
+  replicas: 6
+  strategy:
+    canary:
+      # Canary service for testing traffic
+      canaryService: scriptsynthcore-arena-canary
+      # Stable service for production traffic
+      stableService: scriptsynthcore-arena-stable
+      
+      # Traffic routing via Istio
+      trafficRouting:
+        istio:
+          virtualService:
+            name: scriptsynthcore-arena-vs
+            routes:
+            - primary
+          destinationRule:
+            name: scriptsynthcore-arena-dr
+            canarySubsetName: canary
+            stableSubsetName: stable
+      
+      # 10-step canary progression
+      steps:
+      # Step 1: 5% traffic for 2 minutes
+      - setWeight: 5
+      - pause:
+          duration: 2m
+      
+      # Step 2: 10% traffic with analysis
+      - setWeight: 10
+      - pause:
+          duration: 3m
+      - analysis:
+          templates:
+          - templateName: success-rate
+          - templateName: latency-p99
+          args:
+          - name: service-name
+            value: scriptsynthcore-arena-canary
+          - name: namespace
+            value: scriptsynthcore
+      
+      # Step 3: 20% traffic
+      - setWeight: 20
+      - pause:
+          duration: 5m
+      
+      # Step 4: 30% traffic with extended analysis
+      - setWeight: 30
+      - pause:
+          duration: 5m
+      - analysis:
+          templates:
+          - templateName: success-rate
+          - templateName: latency-p99
+          - templateName: error-rate
+          args:
+          - name: service-name
+            value: scriptsynthcore-arena-canary
+          - name: namespace
+            value: scriptsynthcore
+      
+      # Step 5: 40% traffic
+      - setWeight: 40
+      - pause:
+          duration: 5m
+      
+      # Step 6: 50% traffic (50/50 split)
+      - setWeight: 50
+      - pause:
+          duration: 10m
+      - analysis:
+          templates:
+          - templateName: success-rate
+          - templateName: latency-p99
+          - templateName: error-rate
+          - templateName: memory-usage
+          args:
+          - name: service-name
+            value: scriptsynthcore-arena-canary
+          - name: namespace
+            value: scriptsynthcore
+      
+      # Step 7: 60% traffic
+      - setWeight: 60
+      - pause:
+          duration: 5m
+      
+      # Step 8: 80% traffic
+      - setWeight: 80
+      - pause:
+          duration: 5m
+      
+      # Step 9: 90% traffic with final analysis
+      - setWeight: 90
+      - pause:
+          duration: 5m
+      - analysis:
+          templates:
+          - templateName: success-rate
+          - templateName: latency-p99
+          - templateName: error-rate
+          - templateName: memory-usage
+          - templateName: cpu-usage
+          args:
+          - name: service-name
+            value: scriptsynthcore-arena-canary
+          - name: namespace
+            value: scriptsynthcore
+      
+      # Step 10: 100% traffic (full promotion)
+      - setWeight: 100
+      - pause:
+          duration: 2m
+
+      # Analysis configuration
+      analysis:
+        # Analysis during canary steps
+        templates:
+        - templateName: success-rate
+        - templateName: latency-p99
+        args:
+        - name: service-name
+          value: scriptsynthcore-arena-canary
+        - name: namespace
+          value: scriptsynthcore
+        
+        # Start analysis after first step
+        startingStep: 2
+        
+        # Analysis intervals
+        args:
+        - name: interval
+          value: "30s"
+        - name: count
+          value: "10"
+
+      # Automatic rollback triggers
+      abortScaleDownDelaySeconds: 30
+      scaleDownDelaySeconds: 30
+      
+      # Manual approval gates (optional)
+      # steps:
+      # - pause: {}  # Manual approval required
+
+  # Pod template specification
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scriptsynthcore
+      app.kubernetes.io/component: arena
+  
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scriptsynthcore
+        app.kubernetes.io/component: arena
+        app.kubernetes.io/part-of: scriptsynthcore
+        app.kubernetes.io/version: "4.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+        sidecar.istio.io/inject: "true"
+    spec:
+      serviceAccountName: arena-service-account
+      
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      
+      containers:
+      - name: arena
+        image: scriptsynthcore/distributed-arena:4.0.0
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        - name: gossip
+          containerPort: 8081
+          protocol: TCP
+        
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: DISTRIBUTED_ARENA_ENABLED
+          value: "true"
+        - name: FEDERATED_LEARNING_ENABLED
+          value: "true"
+        - name: LIVE_REWARD_DIAL_ENABLED
+          value: "true"
+        - name: ARENA_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+            ephemeral-storage: 10Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+            ephemeral-storage: 1Gi
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+          successThreshold: 1
+        
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+          successThreshold: 1
+        
+        # Volume mounts
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        - name: secrets
+          mountPath: /app/secrets
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /app/cache
+      
+      # Node selection and tolerations
+      nodeSelector:
+        role: compute
+        workload: arena-nodes
+      
+      tolerations:
+      - key: compute-optimized
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+      
+      # Pod anti-affinity for HA
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - scriptsynthcore
+              topologyKey: kubernetes.io/hostname
+      
+      # Volumes
+      volumes:
+      - name: config
+        configMap:
+          name: scriptsynthcore-config
+      - name: secrets
+        secret:
+          secretName: scriptsynthcore-secrets
+      - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir:
+          sizeLimit: 1Gi
+
+  # Rollback configuration
+  revisionHistoryLimit: 5
+  
+  # Progress deadline
+  progressDeadlineSeconds: 1800  # 30 minutes
+
+---
+# Analysis Templates for Canary Validation
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: scriptsynthcore
+spec:
+  args:
+  - name: service-name
+  - name: namespace
+  - name: interval
+    value: "30s"
+  - name: count
+    value: "10"
+  
+  metrics:
+  - name: success-rate
+    interval: "{{args.interval}}"
+    count: "{{args.count}}"
+    successCondition: result[0] >= 0.95  # 95% success rate
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          (
+            sum(rate(http_requests_total{service="{{args.service-name}}",namespace="{{args.namespace}}",code!~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}",namespace="{{args.namespace}}"}[5m]))
+          )
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: latency-p99
+  namespace: scriptsynthcore
+spec:
+  args:
+  - name: service-name
+  - name: namespace
+  - name: interval
+    value: "30s"
+  - name: count
+    value: "10"
+  
+  metrics:
+  - name: latency-p99
+    interval: "{{args.interval}}"
+    count: "{{args.count}}"
+    successCondition: result[0] <= 0.5  # 500ms P99 latency
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket{service="{{args.service-name}}",namespace="{{args.namespace}}"}[5m]))
+            by (le)
+          )
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: error-rate
+  namespace: scriptsynthcore
+spec:
+  args:
+  - name: service-name
+  - name: namespace
+  - name: interval
+    value: "30s"
+  - name: count
+    value: "10"
+  
+  metrics:
+  - name: error-rate
+    interval: "{{args.interval}}"
+    count: "{{args.count}}"
+    successCondition: result[0] <= 0.05  # 5% error rate threshold
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          (
+            sum(rate(http_requests_total{service="{{args.service-name}}",namespace="{{args.namespace}}",code=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}",namespace="{{args.namespace}}"}[5m]))
+          )
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: memory-usage
+  namespace: scriptsynthcore
+spec:
+  args:
+  - name: service-name
+  - name: namespace
+  - name: interval
+    value: "30s"
+  - name: count
+    value: "10"
+  
+  metrics:
+  - name: memory-usage
+    interval: "{{args.interval}}"
+    count: "{{args.count}}"
+    successCondition: result[0] <= 3221225472  # 3GB memory limit
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          avg(container_memory_usage_bytes{pod=~"{{args.service-name}}-.*",namespace="{{args.namespace}}",container!="POD"})
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: cpu-usage
+  namespace: scriptsynthcore
+spec:
+  args:
+  - name: service-name
+  - name: namespace
+  - name: interval
+    value: "30s"
+  - name: count
+    value: "10"
+  
+  metrics:
+  - name: cpu-usage
+    interval: "{{args.interval}}"
+    count: "{{args.count}}"
+    successCondition: result[0] <= 1.5  # 1.5 CPU cores
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          avg(rate(container_cpu_usage_seconds_total{pod=~"{{args.service-name}}-.*",namespace="{{args.namespace}}",container!="POD"}[5m])) 

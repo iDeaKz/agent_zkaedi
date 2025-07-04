@@ -1,0 +1,387 @@
+# 🛰️ Phase 4 - Helmfile Configuration
+# GitOps deployment orchestration for ScriptSynthCore
+
+helmDefaults:
+  createNamespace: true
+  wait: true
+  timeout: 600
+  force: false
+  atomic: true
+  cleanupOnFail: true
+  historyMax: 5
+
+# Common labels applied to all releases
+commonLabels:
+  project: scriptsynthcore
+  phase: "4"
+  managed-by: helmfile
+
+# Repository definitions
+repositories:
+  # Core Kubernetes tools
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
+  - name: karpenter
+    url: https://charts.karpenter.sh
+  
+  # Monitoring stack
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  
+  # External secrets and security
+  - name: external-secrets
+    url: https://charts.external-secrets.io
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+  
+  # Databases and caching
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  
+  # Chaos engineering
+  - name: chaos-mesh
+    url: https://charts.chaos-mesh.org
+
+# Environment-specific configurations
+environments:
+  dev:
+    values:
+      - environment: dev
+      - replicaCount: 1
+      - autoscaling:
+          enabled: false
+      - monitoring:
+          enabled: true
+      - chaos:
+          enabled: false
+  
+  staging:
+    values:
+      - environment: staging
+      - replicaCount: 2
+      - autoscaling:
+          enabled: true
+          minReplicas: 2
+          maxReplicas: 10
+      - monitoring:
+          enabled: true
+      - chaos:
+          enabled: true
+  
+  prod:
+    values:
+      - environment: prod
+      - replicaCount: 3
+      - autoscaling:
+          enabled: true
+          minReplicas: 3
+          maxReplicas: 20
+      - monitoring:
+          enabled: true
+      - chaos:
+          enabled: false
+
+# Release definitions
+releases:
+  # 1. Argo CD for GitOps
+  - name: argocd
+    namespace: argocd
+    chart: argo/argo-cd
+    version: "5.51.6"
+    values:
+      - server:
+          service:
+            type: LoadBalancer
+          config:
+            url: https://argocd.scriptsynthcore.dev
+          ingress:
+            enabled: true
+            ingressClassName: alb
+            annotations:
+              alb.ingress.kubernetes.io/scheme: internet-facing
+              alb.ingress.kubernetes.io/target-type: ip
+              alb.ingress.kubernetes.io/ssl-redirect: "443"
+            hosts:
+              - argocd.scriptsynthcore.dev
+      - controller:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+      - repoServer:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+
+  # 2. Argo Rollouts for progressive delivery
+  - name: argo-rollouts
+    namespace: argo-rollouts
+    chart: argo/argo-rollouts
+    version: "2.32.7"
+    values:
+      - controller:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+      - dashboard:
+          enabled: true
+          service:
+            type: ClusterIP
+          ingress:
+            enabled: true
+            ingressClassName: alb
+            hosts:
+              - rollouts.scriptsynthcore.dev
+
+  # 3. Istio Service Mesh
+  - name: istio-base
+    namespace: istio-system
+    chart: istio/base
+    version: "1.23.2"
+
+  - name: istiod
+    namespace: istio-system
+    chart: istio/istiod
+    version: "1.23.2"
+    needs:
+      - istio-system/istio-base
+    values:
+      - pilot:
+          traceSampling: 1.0
+      - meshConfig:
+          defaultConfig:
+            proxyStatsMatcher:
+              inclusionRegexps:
+                - ".*outlier_detection.*"
+                - ".*circuit_breaker.*"
+                - ".*upstream_rq_retry.*"
+                - ".*_cx_.*"
+
+  - name: istio-gateway
+    namespace: istio-system
+    chart: istio/gateway
+    version: "1.23.2"
+    needs:
+      - istio-system/istiod
+    values:
+      - service:
+          type: LoadBalancer
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-type: nlb
+            service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+
+  # 4. Karpenter for node auto-scaling
+  - name: karpenter
+    namespace: karpenter
+    chart: karpenter/karpenter
+    version: "v0.37.0"
+    values:
+      - serviceAccount:
+          annotations:
+            eks.amazonaws.com/role-arn: "{{ .Values.karpenter.roleArn }}"
+      - settings:
+          aws:
+            clusterName: "{{ .Values.cluster.name }}"
+            defaultInstanceProfile: "{{ .Values.karpenter.instanceProfile }}"
+            interruptionQueueName: "{{ .Values.cluster.name }}"
+
+  # 5. External Secrets Operator
+  - name: external-secrets
+    namespace: external-secrets-system
+    chart: external-secrets/external-secrets
+    version: "0.9.11"
+    values:
+      - installCRDs: true
+      - webhook:
+          port: 9443
+      - certController:
+          create: true
+
+  # 6. Prometheus Monitoring Stack
+  - name: kube-prometheus-stack
+    namespace: monitoring
+    chart: prometheus-community/kube-prometheus-stack
+    version: "55.5.0"
+    values:
+      - prometheus:
+          prometheusSpec:
+            retention: 30d
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: gp3
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 100Gi
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+      - grafana:
+          adminPassword: "{{ .Values.grafana.adminPassword }}"
+          persistence:
+            enabled: true
+            storageClassName: gp3
+            size: 10Gi
+          ingress:
+            enabled: true
+            ingressClassName: alb
+            hosts:
+              - grafana.scriptsynthcore.dev
+
+  # 7. Loki for log aggregation
+  - name: loki
+    namespace: monitoring
+    chart: grafana/loki-stack
+    version: "2.10.2"
+    values:
+      - loki:
+          persistence:
+            enabled: true
+            storageClassName: gp3
+            size: 50Gi
+      - promtail:
+          enabled: true
+      - fluent-bit:
+          enabled: false
+
+  # 8. Tempo for distributed tracing
+  - name: tempo
+    namespace: monitoring
+    chart: grafana/tempo
+    version: "1.7.1"
+    values:
+      - persistence:
+          enabled: true
+          storageClassName: gp3
+          size: 50Gi
+
+  # 9. HashiCorp Vault for secrets management
+  - name: vault
+    namespace: vault
+    chart: hashicorp/vault
+    version: "0.27.0"
+    condition: vault.enabled
+    values:
+      - server:
+          ha:
+            enabled: true
+            replicas: 3
+          dataStorage:
+            enabled: true
+            storageClass: gp3
+            size: 10Gi
+          auditStorage:
+            enabled: true
+            storageClass: gp3
+            size: 10Gi
+      - injector:
+          enabled: true
+
+  # 10. Redis for caching and pub/sub
+  - name: redis
+    namespace: scriptsynthcore
+    chart: bitnami/redis
+    version: "18.1.5"
+    values:
+      - auth:
+          enabled: true
+          password: "{{ .Values.redis.password }}"
+      - master:
+          persistence:
+            enabled: true
+            storageClass: gp3
+            size: 20Gi
+      - replica:
+          replicaCount: 2
+          persistence:
+            enabled: true
+            storageClass: gp3
+            size: 20Gi
+
+  # 11. PostgreSQL for persistent data
+  - name: postgresql
+    namespace: scriptsynthcore
+    chart: bitnami/postgresql
+    version: "12.12.10"
+    values:
+      - auth:
+          postgresPassword: "{{ .Values.postgresql.password }}"
+          database: scriptsynthcore
+      - primary:
+          persistence:
+            enabled: true
+            storageClass: gp3
+            size: 100Gi
+      - readReplicas:
+          replicaCount: 1
+          persistence:
+            enabled: true
+            storageClass: gp3
+            size: 100Gi
+
+  # 12. Chaos Mesh for chaos engineering
+  - name: chaos-mesh
+    namespace: chaos-testing
+    chart: chaos-mesh/chaos-mesh
+    version: "2.6.2"
+    condition: chaos.enabled
+    values:
+      - chaosDaemon:
+          runtime: containerd
+          socketPath: /run/containerd/containerd.sock
+      - dashboard:
+          securityMode: false
+          ingress:
+            enabled: true
+            ingressClassName: alb
+            hosts:
+              - chaos.scriptsynthcore.dev
+
+  # 13. ScriptSynthCore Application (via local chart)
+  - name: scriptsynthcore
+    namespace: scriptsynthcore
+    chart: ../helm-chart/scriptsynthcore
+    values:
+      - ../helm-chart/scriptsynthcore/values.yaml
+      - environment: "{{ .Environment.Name }}"
+      - image:
+          tag: "{{ .Values.app.version | default \"4.0.0\" }}"
+      - serviceAccount:
+          annotations:
+            eks.amazonaws.com/role-arn: "{{ .Values.irsa.arenaRoleArn }}"
+      - ingress:
+          annotations:
+            alb.ingress.kubernetes.io/certificate-arn: "{{ .Values.ssl.certificateArn }}"
+    needs:
+      - scriptsynthcore/redis
+      - scriptsynthcore/postgresql
+      - external-secrets-system/external-secrets
+      - istio-system/istiod
+
+# Hooks for lifecycle management
+hooks:
+  - events: ["presync"]
+    showlogs: true
+    command: "scripts/pre-deploy-checks.sh"
+    args: ["{{ .Environment.Name }}"]
+  
+  - events: ["postsync"]
+    showlogs: true
+    command: "scripts/post-deploy-validation.sh"
+    args: ["{{ .Environment.Name }}"]
+
+# Template functions and helpers
+templates:
+  default: |
+    environment: {{ .Environment.Name }}
+    cluster:
+      name: scriptsynthcore-{{ .Environment.Name }}-eks
+    app:
+      version: "4.0.0" 

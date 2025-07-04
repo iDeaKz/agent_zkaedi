@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResilienceConfig",
+  "type": "object",
+  "properties": {
+    "max_retries": {
+      "title": "Max Retries",
+      "type": "integer",
+      "minimum": 0,
+      "default": 3,
+      "description": "Maximum number of retry attempts"
+    },
+    "backoff_factor": {
+      "title": "Backoff Factor",
+      "type": "number",
+      "minimum": 0.0,
+      "default": 0.5,
+      "description": "Base factor for exponential backoff calculation"
+    },
+    "health_check_interval": {
+      "title": "Health Check Interval",
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "default": 60.0,
+      "description": "Interval between health checks in seconds"
+    },
+    "failure_threshold": {
+      "title": "Failure Threshold",
+      "type": "integer",
+      "minimum": 1,
+      "default": 5,
+      "description": "Number of failures before circuit breaker opens"
+    },
+    "recovery_timeout": {
+      "title": "Recovery Timeout",
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "default": 60.0,
+      "description": "Time to wait before attempting recovery in seconds"
+    },
+    "jitter": {
+      "title": "Jitter",
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to add random jitter to retry delays"
+    },
+    "max_delay": {
+      "title": "Max Delay",
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "default": 300.0,
+      "description": "Maximum delay cap in seconds"
+    }
+  },
+  "additionalProperties": false
+} 

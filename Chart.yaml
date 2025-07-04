@@ -1,0 +1,59 @@
+apiVersion: v2
+name: scriptsynthcore
+description: ScriptSynthCore Distributed Arena - Planet-scale AI agent evolution platform
+type: application
+version: 4.0.0
+appVersion: "4.0.0"
+
+keywords:
+  - ai
+  - machine-learning
+  - distributed-computing
+  - kubernetes
+  - arena
+  - evolution
+
+home: https://github.com/scriptsynthcore/distributed-arena
+sources:
+  - https://github.com/scriptsynthcore/distributed-arena
+
+maintainers:
+  - name: ScriptSynthCore Team
+    email: team@scriptsynthcore.dev
+
+annotations:
+  artifacthub.io/category: machine-learning
+  artifacthub.io/license: MIT
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/changes: |
+    - kind: added
+      description: Phase 4 distributed arena system
+    - kind: added
+      description: Federated learning capabilities
+    - kind: added
+      description: Live parameter tuning
+    - kind: added
+      description: Gossip synchronization layer
+    - kind: added
+      description: Production-grade error handling
+    - kind: security
+      description: Enhanced security with mTLS and RBAC
+
+dependencies:
+  - name: redis
+    version: "18.1.5"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+  - name: postgresql
+    version: "12.12.10"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: prometheus
+    version: "25.8.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: monitoring.prometheus.enabled
+  - name: grafana
+    version: "7.0.19"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: monitoring.grafana.enabled 
