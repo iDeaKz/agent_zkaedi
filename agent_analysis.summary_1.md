@@ -1,0 +1,19 @@
+# Data Summary
+|Metric|Value|
+|---|---|
+|Value.count|27.0|
+|Value.mean|41454.427752626325|
+|Value.std|192935.15400075223|
+|Value.min|-0.7590365418920992|
+|Value.25%|0.0795628990828378|
+|Value.50%|1.0|
+|Value.75%|1.0|
+|Value.max|1000000.0|
+|Index.count|10.0|
+|Index.mean|589246.0|
+|Index.std|311814.36743428686|
+|Index.min|107933.0|
+|Index.25%|387050.75|
+|Index.50%|641230.5|
+|Index.75%|835327.5|
+|Index.max|958575.0|

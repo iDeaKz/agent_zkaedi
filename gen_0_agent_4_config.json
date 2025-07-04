@@ -1,0 +1,9 @@
+{
+  "epsilon": 0.27779963412648656,
+  "lr": 0.0022033563801816917,
+  "discount": 0.9349080876294571,
+  "reward_shaping": 0.9698313244426688,
+  "partial_reward": 0.05,
+  "near_success_reward": 0.1,
+  "entropy_bonus": 0.04567255712627354
+}
