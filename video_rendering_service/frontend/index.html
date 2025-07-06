@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite AI Video Rendering Service</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body class="theme-dark">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-video"></i>
+                    <span>Elite AI Video Rendering</span>
+                </div>
+                <div class="header-controls">
+                    <div class="hardware-status">
+                        <div class="hardware-indicator">
+                            <i class="fas fa-microchip"></i>
+                            <span id="hardware-tier">ULTRA</span>
+                        </div>
+                        <div class="hardware-indicator">
+                            <i class="fas fa-memory"></i>
+                            <span id="ram-status">64GB</span>
+                        </div>
+                        <div class="hardware-indicator">
+                            <i class="fas fa-hdd"></i>
+                            <span id="storage-status">8TB NVMe</span>
+                        </div>
+                    </div>
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-cloud-upload-alt"></i> Upload & Process Video</h2>
+                        <div class="card-actions">
+                            <button class="btn btn-secondary" onclick="clearAll()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Drag & Drop Video Files</h3>
+                            <p>Or <button class="btn-link" onclick="document.getElementById('file-input').click()">browse files</button></p>
+                            <div class="upload-info">
+                                <span>Supported formats: MP4, AVI, MOV, MKV, WebM</span>
+                                <span>Max file size: <span id="max-file-size">10GB</span></span>
+                            </div>
+                            <input type="file" id="file-input" accept="video/*" multiple hidden>
+                        </div>
+                        
+                        <!-- AI Enhancement Options -->
+                        <div class="enhancement-options">
+                            <h4><i class="fas fa-magic"></i> AI Enhancement Options</h4>
+                            <div class="enhancement-grid">
+                                <label class="enhancement-option">
+                                    <input type="checkbox" value="upscaling" checked>
+                                    <div class="option-content">
+                                        <i class="fas fa-expand-arrows-alt"></i>
+                                        <span>AI Upscaling</span>
+                                        <small>Enhance resolution using AI</small>
+                                    </div>
+                                </label>
+                                <label class="enhancement-option">
+                                    <input type="checkbox" value="noise_reduction" checked>
+                                    <div class="option-content">
+                                        <i class="fas fa-volume-mute"></i>
+                                        <span>Noise Reduction</span>
+                                        <small>Remove visual & audio noise</small>
+                                    </div>
+                                </label>
+                                <label class="enhancement-option">
+                                    <input type="checkbox" value="color_enhancement">
+                                    <div class="option-content">
+                                        <i class="fas fa-palette"></i>
+                                        <span>Color Enhancement</span>
+                                        <small>Improve color grading</small>
+                                    </div>
+                                </label>
+                                <label class="enhancement-option">
+                                    <input type="checkbox" value="stabilization">
+                                    <div class="option-content">
+                                        <i class="fas fa-balance-scale"></i>
+                                        <span>Stabilization</span>
+                                        <small>Reduce camera shake</small>
+                                    </div>
+                                </label>
+                                <label class="enhancement-option">
+                                    <input type="checkbox" value="object_detection">
+                                    <div class="option-content">
+                                        <i class="fas fa-search"></i>
+                                        <span>Object Detection</span>
+                                        <small>AI-powered object tracking</small>
+                                    </div>
+                                </label>
+                                <label class="enhancement-option">
+                                    <input type="checkbox" value="scene_analysis">
+                                    <div class="option-content">
+                                        <i class="fas fa-eye"></i>
+                                        <span>Scene Analysis</span>
+                                        <small>Intelligent scene recognition</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Processing Dashboard -->
+            <section class="dashboard-section">
+                <div class="dashboard-grid">
+                    <!-- Real-time Progress -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tasks"></i> Processing Queue</h3>
+                            <div class="status-indicator">
+                                <span class="status-dot active" id="connection-status"></span>
+                                <span>Live Updates</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="processing-queue" class="processing-queue">
+                                <div class="empty-state">
+                                    <i class="fas fa-hourglass"></i>
+                                    <p>No active processing jobs</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3D Visualization -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-cube"></i> Performance Visualization</h3>
+                            <div class="card-actions">
+                                <button class="btn btn-sm" onclick="resetVisualization()">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="threejs-container" class="visualization-container">
+                                <canvas id="performance-canvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Stats -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-line"></i> System Performance</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-microchip"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-label">CPU Usage</span>
+                                        <span class="stat-value" id="cpu-usage">0%</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-memory"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-label">Memory</span>
+                                        <span class="stat-value" id="memory-usage">0GB / 64GB</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-hdd"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-label">Storage</span>
+                                        <span class="stat-value" id="storage-usage">0TB / 8TB</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-label">GPU Usage</span>
+                                        <span class="stat-value" id="gpu-usage">0%</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-label">Avg Processing</span>
+                                        <span class="stat-value" id="avg-processing">0s</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-label">Jobs Completed</span>
+                                        <span class="stat-value" id="jobs-completed">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Jobs -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> Recent Jobs</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="recent-jobs" class="recent-jobs">
+                                <div class="empty-state">
+                                    <i class="fas fa-history"></i>
+                                    <p>No recent jobs</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>Processing Video...</h3>
+            <p id="loading-message">Initializing AI enhancement models</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script src="visualization.js"></script>
+</body>
+</html>
