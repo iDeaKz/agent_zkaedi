@@ -1,3 +1,7 @@
+Here is the full content of the README.md for agent_zkaedi:
+
+---
+
 # agent_zkaedi
 
 [![Terraform 1.8+](https://img.shields.io/badge/Terraform-%E2%86%921.8-623CE4?logo=terraform)](https://www.terraform.io/)
@@ -15,6 +19,8 @@
 [![HTML/JS/CSS Ready](https://img.shields.io/badge/Web-Ready-blue?logo=html5&logoColor=white)]
 [![Python Ready](https://img.shields.io/badge/Python-Ready-3776AB?logo=python&logoColor=white)]
 [![Amazing Completionist](https://img.shields.io/badge/Completionist-Amazing-orange?logo=star)]
+
+---
 
 ## 🏗️ Project Overview
 
@@ -100,6 +106,7 @@ Every level and tier maxed. Every situation handled. Completionist perfection.
 ---
 
 For more, visit the [repo](https://github.com/iDeaKz/agent_zkaedi) and check the `/docs`, `/tutorials`, and `/dev-tools` folders for the full elite experience.
+
 # 🛡️ Resilience Core
 
 **Production-grade retry, circuit breaker, and health check patterns for robust Python applications.**
@@ -469,3 +476,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Made with ❤️ by the Resilience Core Team** 
+
+---
