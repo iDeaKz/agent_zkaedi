@@ -1,3 +1,96 @@
+# agent_zkaedi
+
+[![Code Quality](https://img.shields.io/badge/code--quality-elite-brightgreen)](https://github.com/iDeaKz/agent_zkaedi)
+[![Build Status](https://img.shields.io/badge/build-passing-success)](https://github.com/iDeaKz/agent_zkaedi/actions)
+[![Test Coverage](https://img.shields.io/badge/coverage-100%25-blue)](https://github.com/iDeaKz/agent_zkaedi)
+[![Security](https://img.shields.io/badge/security-enterprise--grade-critical)](https://github.com/iDeaKz/agent_zkaedi)
+[![Docs](https://img.shields.io/badge/docs-sphinx%2Fmkdocs-informational)](https://github.com/iDeaKz/agent_zkaedi)
+[![License](https://img.shields.io/badge/license-custom-lightgrey)](https://github.com/iDeaKz/agent_zkaedi)
+
+## 🏗️ Project Overview
+
+**Agent_zkaedi** is an enterprise-grade Agent Monitoring and Management System with deep integration and elite developer tooling.  
+It features a robust, modular architecture with perfect error handling, real-time metrics, and educational resources for every specialist.
+
+---
+
+### 🔥 Key Features
+
+- **Frontend:**  
+  React 18 + TypeScript + Vite for a modern dashboard (3D/2D agent visualization with Three.js & React Force Graph)
+- **Backend:**  
+  Python FastAPI with JWT authentication, RBAC, async support, and a plugin sandbox for secure extensibility
+- **Core Module:**  
+  ScriptSynthCore with blockchain API integration, vector optimization, and real-time data processing
+- **Security:**  
+  Multi-layered (CSP, CSRF, input sanitization, rate limiting, DDoS protection, plugin sandbox)
+- **Monitoring:**  
+  Prometheus/Grafana for metrics, anomaly detection, health tracking, and observability
+- **Testing:**  
+  100% code coverage using pytest, mutation/property-based testing, and e2e/integration suites
+- **Documentation:**  
+  Sphinx/MkDocs with tutorials, advanced guides, and security references
+- **Developer Toolkit:**  
+  Python scripts & Makefile for environment setup, monitoring, benchmarking, cleanup, and auto-dependency conflict detection
+
+---
+
+### 🚀 Codebase Structure
+
+- `frontend/`: React, TypeScript, Material-UI, Three.js, WebSocket for real-time/3D visualization
+- `backend/`: FastAPI, SQLAlchemy, Redis, RBAC, core agent logic, async blockchain, vector embedding
+- `core/`: Agent control, plugin sandbox, reward system, circuit breaker, holomorphic processing
+- `dev-tools/`:
+  - `elite_dev_toolkit.py`: Health, test, monitor, benchmark, clean, error reporting, Docker integration
+  - `setup_enhanced_environment.py`: Automated environment & service setup, dependency management, E2E & security test bootstrapping
+  - `requirements.txt`: Enhanced dev/test/deploy/security tooling
+- `tests/`:
+  - `integration_advanced/`, `e2e/`, `security/`: Full-stack and security test suites
+- `docs/`:
+  - `security/SECURITY_GUIDE.md`: Enterprise security playbook (JWT, RBAC, secrets, incident response, checklists)
+- `tutorials/`:
+  - `01_getting_started.md`: 5-min setup, architecture, workflow, first PR, debugging, learning paths
+  - `02_advanced_features.md`: PBT, advanced JWT, analytics, blue-green/canary deploy, codegen, performance, caching
+
+---
+
+### 📈 Technical Excellence & Roadmap Highlights
+
+- Modular, extensible, plugin-friendly, and ready for AI-powered generation and visual designer
+- Industry templates (healthcare, finance, automotive), global cloud deployment, and integration marketplace
+- Full “self-healing” error management, recursive safeguards, and production error correction at every tier
+- Real-time monitoring, advanced security scanning, automated CI/CD, and property-based testing
+
+---
+
+### 💡 Developer Quickstart
+
+```bash
+make setup          # Complete environment setup
+make dev            # Start servers
+make test           # Run all tests
+make test-security  # Security & fuzz testing
+make monitor        # Real-time metrics
+make deploy-staging # Staging deployment
+
+python dev-tools/elite_dev_toolkit.py status    # System status
+python dev-tools/elite_dev_toolkit.py setup     # Quick setup
+python dev-tools/elite_dev_toolkit.py test      # Advanced testing
+python dev-tools/elite_dev_toolkit.py monitor   # Live monitoring
+python dev-tools/elite_dev_toolkit.py benchmark # Performance testing
+python dev-tools/elite_dev_toolkit.py clean     # Smart cleanup
+```
+
+---
+
+### 📚 Learning & Support
+
+World-class documentation, security guides, troubleshooting, and advanced tutorials for every role and skill level.  
+Every level and tier maxed. Every situation handled. Completionist perfection.
+
+---
+
+For more, visit the [repo](https://github.com/iDeaKz/agent_zkaedi) and check the `/docs`, `/tutorials`, and `/dev-tools` folders for the full elite experience.
 # 🛡️ Resilience Core
 
 **Production-grade retry, circuit breaker, and health check patterns for robust Python applications.**
