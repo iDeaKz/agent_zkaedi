@@ -1,0 +1,156 @@
+{
+  "installation_summary": {
+    "total_packages": 11,
+    "successful_installations": 11,
+    "failed_installations": 0,
+    "success_rate_percent": 100.0,
+    "total_time_seconds": 18.199788570404053,
+    "average_time_per_package": 1.6545262336730957
+  },
+  "category_breakdown": {
+    "performance": {
+      "success": 4,
+      "failed": 0,
+      "total": 4
+    },
+    "core": {
+      "success": 1,
+      "failed": 0,
+      "total": 1
+    },
+    "monitoring": {
+      "success": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "visualization": {
+      "success": 3,
+      "failed": 0,
+      "total": 3
+    }
+  },
+  "successful_packages": [
+    "numba",
+    "numpy",
+    "scipy",
+    "psutil",
+    "py-spy",
+    "memory-profiler",
+    "cachetools",
+    "joblib",
+    "plotly",
+    "dash",
+    "matplotlib"
+  ],
+  "failed_packages": [],
+  "detailed_results": [
+    {
+      "package": "numba",
+      "success": true,
+      "install_time": 1.714428186416626,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "0.61.2"
+    },
+    {
+      "package": "numpy",
+      "success": true,
+      "install_time": 1.0909764766693115,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "2.2.6"
+    },
+    {
+      "package": "scipy",
+      "success": true,
+      "install_time": 1.5445711612701416,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "1.16.0"
+    },
+    {
+      "package": "psutil",
+      "success": true,
+      "install_time": 1.2598686218261719,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "7.0.0"
+    },
+    {
+      "package": "py-spy",
+      "success": true,
+      "install_time": 2.594899892807007,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "0.4.0"
+    },
+    {
+      "package": "memory-profiler",
+      "success": true,
+      "install_time": 2.8707220554351807,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "0.61.0"
+    },
+    {
+      "package": "cachetools",
+      "success": true,
+      "install_time": 1.2449588775634766,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "6.1.0"
+    },
+    {
+      "package": "joblib",
+      "success": true,
+      "install_time": 1.5318818092346191,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "1.5.1"
+    },
+    {
+      "package": "plotly",
+      "success": true,
+      "install_time": 1.0840260982513428,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "6.2.0"
+    },
+    {
+      "package": "dash",
+      "success": true,
+      "install_time": 10.934497833251953,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "3.1.1"
+    },
+    {
+      "package": "matplotlib",
+      "success": true,
+      "install_time": 1.376009464263916,
+      "error_message": null,
+      "fallback_used": null,
+      "version_installed": "3.10.3"
+    }
+  ],
+  "system_info": {
+    "platform": "Linux",
+    "architecture": "64bit",
+    "python_version": "3.12.3",
+    "cpu_count": 4,
+    "is_gpu_system": {
+      "intel_gpu": false,
+      "nvidia_gpu": false,
+      "amd_gpu": false,
+      "opencl_support": false
+    },
+    "package_managers": [
+      "pip",
+      "conda",
+      "apt"
+    ]
+  },
+  "recommendations": [
+    "\ud83c\udf89 Perfect installation! All packages installed successfully."
+  ]
+}

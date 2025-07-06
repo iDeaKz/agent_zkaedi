@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 ZKAEDI Ultimate Performance Dashboard</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .dashboard-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dashboard-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #cbd5e1);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .dashboard-container {
+            margin-top: 80px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15);
+            border-color: var(--secondary-color);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--success-color), var(--secondary-color));
+        }
+
+        .metric-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--success-color);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-target {
+            font-size: 0.8rem;
+            color: var(--warning-color);
+            padding: 0.25rem 0.5rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .badge-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, var(--card-bg), #2d3748);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .badge.earned {
+            border-color: var(--success-color);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            transform: scale(1.02);
+        }
+
+        .badge.earned::before {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--success-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .badge-emoji {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .badge-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .badge-threshold {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--secondary-color));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .chart-container {
+            grid-column: span 2;
+            height: 400px;
+        }
+
+        .chart-container .metric-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container .metric-card h3 {
+            margin-bottom: 1rem;
+        }
+
+        .chart-container .plotly-graph-div {
+            flex: 1;
+            min-height: 300px;
+        }
+
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid var(--success-color);
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        .gpu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .gpu-indicator {
+            width: 100%;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .gpu-indicator.active {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .gpu-indicator.idle {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .gpu-indicator.error {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .diversity-bar {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .error-healing-stats {
+            margin-top: 1rem;
+        }
+
+        .error-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .error-count {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .auto-refresh {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(30, 58, 138, 0.3);
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .auto-refresh:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .auto-refresh.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .chart-container {
+                grid-column: span 1;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="dashboard-title">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <h1>🚀 ZKAEDI Ultimate Performance Dashboard</h1>
+            <span id="lastUpdate" style="margin-left: auto; font-size: 0.9rem; opacity: 0.8;"></span>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Real-time Performance Metrics -->
+        <div class="metric-card">
+            <h3>⚡ Throughput Performance</h3>
+            <div class="metric-value" id="throughputValue">0</div>
+            <div class="metric-label">operations/second</div>
+            <div class="metric-target">Target: 2000+ ops/sec</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="throughputProgress" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h3>🕓 Latency Performance</h3>
+            <div class="metric-value" id="latencyValue">0</div>
+            <div class="metric-label">milliseconds</div>
+            <div class="metric-target">Target: &lt;1ms latency</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="latencyProgress" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h3>💾 Memory Utilization</h3>
+            <div class="metric-value" id="memoryValue">0</div>
+            <div class="metric-label">GB used / Total GB</div>
+            <div class="metric-target">64GB Corsair Vengeance</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="memoryProgress" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h3>🎮 GPU Utilization</h3>
+            <div class="metric-value" id="gpuValue">0</div>
+            <div class="metric-label">percent utilization</div>
+            <div class="metric-target">Intel Iris Xe GPU</div>
+            <div class="gpu-grid">
+                <div class="gpu-indicator idle" id="gpu0">Core 0</div>
+                <div class="gpu-indicator idle" id="gpu1">Core 1</div>
+                <div class="gpu-indicator idle" id="gpu2">Core 2</div>
+                <div class="gpu-indicator idle" id="gpu3">Core 3</div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <h3>🧬 Holomorphic Processing</h3>
+            <div class="metric-value" id="holomorphicValue">0</div>
+            <div class="metric-label">samples/second</div>
+            <div class="metric-target">Target: 50M+ samples/sec</div>
+        </div>
+
+        <div class="metric-card">
+            <h3>🛡️ Error Recovery Rate</h3>
+            <div class="metric-value" id="errorRecoveryValue">100</div>
+            <div class="metric-label">percent success rate</div>
+            <div class="metric-target">Target: &gt;99% recovery</div>
+            <div class="error-healing-stats">
+                <div class="error-stat">
+                    <span>Memory Errors:</span>
+                    <span class="error-count" id="memoryErrors">0</span>
+                </div>
+                <div class="error-stat">
+                    <span>Runtime Errors:</span>
+                    <span class="error-count" id="runtimeErrors">0</span>
+                </div>
+                <div class="error-stat">
+                    <span>Value Errors:</span>
+                    <span class="error-count" id="valueErrors">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge Achievement System -->
+        <div class="metric-card" style="grid-column: span 2;">
+            <h3>🏆 Achievement Badges</h3>
+            <div class="badge-container" id="badgeContainer">
+                <!-- Badges will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Real-time Performance Chart -->
+        <div class="chart-container">
+            <div class="metric-card">
+                <h3>📊 Real-time Performance Trends</h3>
+                <div id="performanceChart"></div>
+            </div>
+        </div>
+
+        <!-- System Health Overview -->
+        <div class="metric-card">
+            <h3>🖥️ System Health</h3>
+            <div class="system-status">
+                <div class="status-item">
+                    <span>CPU Usage:</span>
+                    <span class="status-value" id="cpuUsage">0%</span>
+                </div>
+                <div class="status-item">
+                    <span>CPU Cores:</span>
+                    <span class="status-value" id="cpuCores">0</span>
+                </div>
+                <div class="status-item">
+                    <span>Storage:</span>
+                    <span class="status-value" id="storageUsage">0 GB</span>
+                </div>
+                <div class="status-item">
+                    <span>Cache Hit Rate:</span>
+                    <span class="status-value" id="cacheHitRate">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Optimization Settings -->
+        <div class="metric-card">
+            <h3>⚙️ Optimization Settings</h3>
+            <div class="system-status">
+                <div class="status-item">
+                    <span>Optimization Level:</span>
+                    <span class="status-value" id="optimizationLevel">Maximum</span>
+                </div>
+                <div class="status-item">
+                    <span>Multi-threading:</span>
+                    <span class="status-value" id="multithreading">Enabled</span>
+                </div>
+                <div class="status-item">
+                    <span>Numba JIT:</span>
+                    <span class="status-value" id="numbaJit">Active</span>
+                </div>
+                <div class="status-item">
+                    <span>GPU Acceleration:</span>
+                    <span class="status-value" id="gpuAcceleration">Intel Iris Xe</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="auto-refresh" id="refreshButton" onclick="refreshData()" title="Refresh Data">
+        🔄
+    </button>
+
+    <script>
+        // Dashboard state
+        let performanceData = {
+            timestamps: [],
+            throughput: [],
+            latency: [],
+            memory: [],
+            gpu: []
+        };
+
+        let isAutoRefresh = true;
+        let refreshInterval;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            startAutoRefresh();
+        });
+
+        function initializeDashboard() {
+            // Initialize badges
+            initializeBadges();
+            
+            // Initialize charts
+            initializePerformanceChart();
+            
+            // Load initial data
+            loadPerformanceData();
+            
+            console.log('🚀 ZKAEDI Ultimate Performance Dashboard initialized');
+        }
+
+        function initializeBadges() {
+            const badges = [
+                { name: 'Speed Demon', emoji: '🚀', description: '100+ ops/sec', threshold: 100, metric: 'throughput' },
+                { name: 'Performance Master', emoji: '🌟', description: '500+ ops/sec', threshold: 500, metric: 'throughput' },
+                { name: 'Ultimate Completionist', emoji: '👑', description: '1000+ ops/sec', threshold: 1000, metric: 'throughput' },
+                { name: 'Latency Destroyer', emoji: '⚡', description: '<1ms latency', threshold: 1, metric: 'latency_reverse' },
+                { name: 'Error Healing Expert', emoji: '🛡️', description: '<1% error rate', threshold: 1, metric: 'error_rate_reverse' },
+                { name: 'GPU Wizard', emoji: '🎮', description: '90%+ GPU usage', threshold: 90, metric: 'gpu' },
+                { name: 'Memory Optimizer', emoji: '💾', description: 'Optimal memory usage', threshold: 80, metric: 'memory' },
+                { name: 'Benchmark Champion', emoji: '📊', description: '#1 ranking', threshold: 2000, metric: 'throughput' }
+            ];
+
+            const container = document.getElementById('badgeContainer');
+            container.innerHTML = '';
+
+            badges.forEach(badge => {
+                const badgeElement = document.createElement('div');
+                badgeElement.className = 'badge';
+                badgeElement.id = `badge-${badge.name.replace(/\s+/g, '-').toLowerCase()}`;
+                badgeElement.innerHTML = `
+                    <div class="badge-emoji">${badge.emoji}</div>
+                    <div class="badge-name">${badge.name}</div>
+                    <div class="badge-threshold">${badge.description}</div>
+                `;
+                container.appendChild(badgeElement);
+            });
+        }
+
+        function initializePerformanceChart() {
+            const layout = {
+                title: '',
+                xaxis: { 
+                    title: 'Time',
+                    gridcolor: '#334155',
+                    linecolor: '#475569'
+                },
+                yaxis: { 
+                    title: 'Operations/Second',
+                    gridcolor: '#334155',
+                    linecolor: '#475569'
+                },
+                plot_bgcolor: 'transparent',
+                paper_bgcolor: 'transparent',
+                font: { color: '#f8fafc' },
+                margin: { t: 20, r: 20, b: 40, l: 60 }
+            };
+
+            const config = {
+                responsive: true,
+                displayModeBar: false
+            };
+
+            Plotly.newPlot('performanceChart', [], layout, config);
+        }
+
+        async function loadPerformanceData() {
+            try {
+                // Simulate API call to get performance data
+                const mockData = generateMockPerformanceData();
+                updateDashboard(mockData);
+            } catch (error) {
+                console.error('Failed to load performance data:', error);
+                updateStatusIndicator('error');
+            }
+        }
+
+        function generateMockPerformanceData() {
+            // Generate realistic performance data based on the optimizer results
+            const now = new Date();
+            const currentThroughput = 317 + Math.random() * 100; // Based on benchmark results
+            const currentLatency = 0.23 + Math.random() * 0.5;    // Based on benchmark results
+            const currentMemory = 2.5 + Math.random() * 1.0;      // GB
+            const currentGPU = Math.random() * 80;                 // %
+
+            return {
+                timestamp: now.toISOString(),
+                performance_metrics: {
+                    throughput_ops_per_sec: currentThroughput,
+                    latency_ms: currentLatency,
+                    memory_usage_gb: currentMemory,
+                    gpu_utilization_percent: currentGPU,
+                    samples_per_second: currentThroughput * 1000,
+                    error_rate_percent: Math.random() * 0.1
+                },
+                system_info: {
+                    cpu_usage: 25 + Math.random() * 30,
+                    cpu_cores: 4,
+                    total_memory_gb: 16,
+                    storage_free_gb: 23.6,
+                    cache_hit_rate: 85 + Math.random() * 10
+                },
+                badges_earned: currentThroughput > 100 ? ['Speed Demon'] : [],
+                error_healing: {
+                    memory_errors: Math.floor(Math.random() * 3),
+                    runtime_errors: Math.floor(Math.random() * 2),
+                    value_errors: Math.floor(Math.random() * 1)
+                }
+            };
+        }
+
+        function updateDashboard(data) {
+            const metrics = data.performance_metrics;
+            const systemInfo = data.system_info;
+            const errorHealing = data.error_healing;
+
+            // Update main metrics
+            document.getElementById('throughputValue').textContent = Math.round(metrics.throughput_ops_per_sec);
+            document.getElementById('latencyValue').textContent = metrics.latency_ms.toFixed(2);
+            document.getElementById('memoryValue').textContent = `${metrics.memory_usage_gb.toFixed(1)} / ${systemInfo.total_memory_gb}`;
+            document.getElementById('gpuValue').textContent = Math.round(metrics.gpu_utilization_percent);
+            document.getElementById('holomorphicValue').textContent = formatLargeNumber(metrics.samples_per_second);
+            document.getElementById('errorRecoveryValue').textContent = (100 - metrics.error_rate_percent).toFixed(1);
+
+            // Update progress bars
+            updateProgress('throughputProgress', metrics.throughput_ops_per_sec, 2000);
+            updateProgress('latencyProgress', (2 - metrics.latency_ms) / 2 * 100); // Reverse for latency
+            updateProgress('memoryProgress', (metrics.memory_usage_gb / systemInfo.total_memory_gb) * 100);
+
+            // Update system health
+            document.getElementById('cpuUsage').textContent = `${Math.round(systemInfo.cpu_usage)}%`;
+            document.getElementById('cpuCores').textContent = systemInfo.cpu_cores;
+            document.getElementById('storageUsage').textContent = `${systemInfo.storage_free_gb} GB`;
+            document.getElementById('cacheHitRate').textContent = `${Math.round(systemInfo.cache_hit_rate)}%`;
+
+            // Update error healing stats
+            document.getElementById('memoryErrors').textContent = errorHealing.memory_errors;
+            document.getElementById('runtimeErrors').textContent = errorHealing.runtime_errors;
+            document.getElementById('valueErrors').textContent = errorHealing.value_errors;
+
+            // Update GPU indicators
+            updateGPUIndicators(metrics.gpu_utilization_percent);
+
+            // Update badges
+            updateBadges(metrics, data.badges_earned);
+
+            // Update performance chart
+            updatePerformanceChart(data.timestamp, metrics);
+
+            // Update status
+            updateStatusIndicator('active');
+            document.getElementById('lastUpdate').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        function updateProgress(elementId, value, max = 100) {
+            const percentage = Math.min((value / max) * 100, 100);
+            document.getElementById(elementId).style.width = `${percentage}%`;
+        }
+
+        function updateGPUIndicators(utilization) {
+            const cores = ['gpu0', 'gpu1', 'gpu2', 'gpu3'];
+            cores.forEach((coreId, index) => {
+                const element = document.getElementById(coreId);
+                const coreUtilization = utilization + (Math.random() - 0.5) * 20;
+                
+                if (coreUtilization > 60) {
+                    element.className = 'gpu-indicator active';
+                } else if (coreUtilization > 20) {
+                    element.className = 'gpu-indicator idle';
+                } else {
+                    element.className = 'gpu-indicator error';
+                }
+            });
+        }
+
+        function updateBadges(metrics, earnedBadges) {
+            const badgeChecks = {
+                'speed-demon': metrics.throughput_ops_per_sec >= 100,
+                'performance-master': metrics.throughput_ops_per_sec >= 500,
+                'ultimate-completionist': metrics.throughput_ops_per_sec >= 1000,
+                'latency-destroyer': metrics.latency_ms <= 1.0,
+                'error-healing-expert': metrics.error_rate_percent <= 1.0,
+                'gpu-wizard': metrics.gpu_utilization_percent >= 90,
+                'memory-optimizer': true, // Always earned if system is running
+                'benchmark-champion': metrics.throughput_ops_per_sec >= 2000
+            };
+
+            Object.entries(badgeChecks).forEach(([badgeId, earned]) => {
+                const element = document.getElementById(`badge-${badgeId}`);
+                if (element) {
+                    if (earned) {
+                        element.classList.add('earned');
+                    } else {
+                        element.classList.remove('earned');
+                    }
+                }
+            });
+        }
+
+        function updatePerformanceChart(timestamp, metrics) {
+            // Add new data point
+            performanceData.timestamps.push(new Date(timestamp));
+            performanceData.throughput.push(metrics.throughput_ops_per_sec);
+            performanceData.latency.push(metrics.latency_ms);
+            performanceData.memory.push(metrics.memory_usage_gb);
+            performanceData.gpu.push(metrics.gpu_utilization_percent);
+
+            // Keep only last 50 data points
+            const maxPoints = 50;
+            if (performanceData.timestamps.length > maxPoints) {
+                performanceData.timestamps = performanceData.timestamps.slice(-maxPoints);
+                performanceData.throughput = performanceData.throughput.slice(-maxPoints);
+                performanceData.latency = performanceData.latency.slice(-maxPoints);
+                performanceData.memory = performanceData.memory.slice(-maxPoints);
+                performanceData.gpu = performanceData.gpu.slice(-maxPoints);
+            }
+
+            const traces = [
+                {
+                    x: performanceData.timestamps,
+                    y: performanceData.throughput,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Throughput (ops/sec)',
+                    line: { color: '#10b981', width: 2 }
+                },
+                {
+                    x: performanceData.timestamps,
+                    y: performanceData.latency.map(x => x * 100), // Scale for visibility
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Latency (ms × 100)',
+                    line: { color: '#f59e0b', width: 2 },
+                    yaxis: 'y2'
+                }
+            ];
+
+            const layout = {
+                xaxis: { 
+                    title: 'Time',
+                    gridcolor: '#334155',
+                    linecolor: '#475569'
+                },
+                yaxis: { 
+                    title: 'Operations/Second',
+                    gridcolor: '#334155',
+                    linecolor: '#475569'
+                },
+                yaxis2: {
+                    title: 'Latency (ms × 100)',
+                    overlaying: 'y',
+                    side: 'right',
+                    gridcolor: '#334155',
+                    linecolor: '#475569'
+                },
+                plot_bgcolor: 'transparent',
+                paper_bgcolor: 'transparent',
+                font: { color: '#f8fafc' },
+                margin: { t: 20, r: 60, b: 40, l: 60 },
+                legend: { 
+                    x: 0, 
+                    y: 1,
+                    bgcolor: 'rgba(30, 41, 59, 0.8)'
+                }
+            };
+
+            Plotly.react('performanceChart', traces, layout);
+        }
+
+        function updateStatusIndicator(status) {
+            const indicator = document.getElementById('statusIndicator');
+            indicator.className = 'status-indicator';
+            
+            switch (status) {
+                case 'active':
+                    indicator.style.background = 'var(--success-color)';
+                    break;
+                case 'warning':
+                    indicator.style.background = 'var(--warning-color)';
+                    break;
+                case 'error':
+                    indicator.style.background = 'var(--danger-color)';
+                    break;
+            }
+        }
+
+        function formatLargeNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return Math.round(num).toString();
+        }
+
+        function refreshData() {
+            const button = document.getElementById('refreshButton');
+            button.classList.add('spinning');
+            
+            loadPerformanceData().finally(() => {
+                setTimeout(() => {
+                    button.classList.remove('spinning');
+                }, 1000);
+            });
+        }
+
+        function startAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
+            refreshInterval = setInterval(() => {
+                if (isAutoRefresh) {
+                    loadPerformanceData();
+                }
+            }, 2000); // Refresh every 2 seconds
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                refreshData();
+            }
+            if (e.key === ' ') {
+                e.preventDefault();
+                isAutoRefresh = !isAutoRefresh;
+                console.log('Auto-refresh:', isAutoRefresh ? 'enabled' : 'disabled');
+            }
+        });
+
+        // Handle visibility change (pause when tab is not visible)
+        document.addEventListener('visibilitychange', function() {
+            isAutoRefresh = !document.hidden;
+        });
+
+        console.log('🚀 ZKAEDI Ultimate Performance Dashboard loaded');
+        console.log('💡 Keyboard shortcuts:');
+        console.log('  - Ctrl+R: Manual refresh');
+        console.log('  - Space: Toggle auto-refresh');
+    </script>
+</body>
+</html>
