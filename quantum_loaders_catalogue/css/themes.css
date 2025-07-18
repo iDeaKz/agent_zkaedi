@@ -1,0 +1,345 @@
+/* Theme System for Quantum Loaders Catalogue */
+
+/* Dark Theme (Default) */
+.theme-dark {
+  /* Background colors */
+  --color-bg-primary: #0a0e1a;
+  --color-bg-secondary: #141b2e;
+  --color-bg-tertiary: #1a2332;
+  --color-bg-header: rgba(10, 14, 26, 0.95);
+  --color-bg-modal: #1a2332;
+  --color-bg-preview: #0f1419;
+  --color-bg-hover: #253347;
+  
+  /* Text colors */
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-inverse: #0a0e1a;
+  
+  /* Accent colors */
+  --color-accent-primary: #00ff88;
+  --color-accent-secondary: #00d4ff;
+  --color-accent-hover: #00e67a;
+  --color-accent-primary-alpha: rgba(0, 255, 136, 0.2);
+  
+  /* Border colors */
+  --color-border-primary: #2d3748;
+  --color-border-hover: #4a5568;
+  
+  /* Special effects */
+  --glow-primary: 0 0 20px var(--color-accent-primary);
+  --glow-secondary: 0 0 30px var(--color-accent-secondary);
+}
+
+/* Light Theme */
+.theme-light {
+  /* Background colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-tertiary: #f1f5f9;
+  --color-bg-header: rgba(255, 255, 255, 0.95);
+  --color-bg-modal: #ffffff;
+  --color-bg-preview: #f9fafb;
+  --color-bg-hover: #e2e8f0;
+  
+  /* Text colors */
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-text-inverse: #ffffff;
+  
+  /* Accent colors */
+  --color-accent-primary: #0066cc;
+  --color-accent-secondary: #7c3aed;
+  --color-accent-hover: #0052a3;
+  --color-accent-primary-alpha: rgba(0, 102, 204, 0.1);
+  
+  /* Border colors */
+  --color-border-primary: #e2e8f0;
+  --color-border-hover: #cbd5e1;
+  
+  /* Special effects */
+  --glow-primary: 0 0 15px rgba(0, 102, 204, 0.3);
+  --glow-secondary: 0 0 20px rgba(124, 58, 237, 0.3);
+  
+  /* Shadows for light theme */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* Neon Theme */
+.theme-neon {
+  /* Background colors */
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #111111;
+  --color-bg-tertiary: #1a1a1a;
+  --color-bg-header: rgba(0, 0, 0, 0.95);
+  --color-bg-modal: #111111;
+  --color-bg-preview: #0a0a0a;
+  --color-bg-hover: #2a0a2a;
+  
+  /* Text colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-inverse: #000000;
+  
+  /* Accent colors */
+  --color-accent-primary: #ff0080;
+  --color-accent-secondary: #00ffff;
+  --color-accent-hover: #e6006b;
+  --color-accent-primary-alpha: rgba(255, 0, 128, 0.3);
+  
+  /* Border colors */
+  --color-border-primary: #333333;
+  --color-border-hover: #555555;
+  
+  /* Special effects */
+  --glow-primary: 0 0 30px var(--color-accent-primary), 0 0 60px var(--color-accent-primary);
+  --glow-secondary: 0 0 30px var(--color-accent-secondary), 0 0 60px var(--color-accent-secondary);
+}
+
+/* Theme-specific enhancements */
+
+/* Dark theme quantum glow effect */
+.theme-dark .quantum-glow {
+  text-shadow: var(--glow-primary);
+  animation: quantum-pulse 3s ease-in-out infinite;
+}
+
+/* Light theme subtle glow */
+.theme-light .quantum-glow {
+  text-shadow: var(--glow-primary);
+}
+
+/* Neon theme intense effects */
+.theme-neon .quantum-glow {
+  text-shadow: var(--glow-primary);
+  animation: neon-flicker 2s linear infinite alternate;
+}
+
+/* Neon theme specific animations */
+.theme-neon .loader-card {
+  border: 1px solid var(--color-accent-primary);
+  box-shadow: inset 0 0 20px rgba(255, 0, 128, 0.1);
+}
+
+.theme-neon .loader-card:hover {
+  box-shadow: 
+    inset 0 0 20px rgba(255, 0, 128, 0.2),
+    0 0 30px var(--color-accent-primary),
+    0 0 60px var(--color-accent-primary);
+  border-color: var(--color-accent-secondary);
+}
+
+.theme-neon .control-btn.primary {
+  box-shadow: 0 0 20px var(--color-accent-primary);
+}
+
+.theme-neon .control-btn.primary:hover {
+  box-shadow: 0 0 30px var(--color-accent-primary), 0 0 60px var(--color-accent-primary);
+}
+
+/* Theme transition animations */
+@keyframes quantum-pulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 20px var(--color-accent-primary)); 
+  }
+  50% { 
+    filter: drop-shadow(0 0 40px var(--color-accent-primary)) drop-shadow(0 0 60px var(--color-accent-secondary)); 
+  }
+}
+
+@keyframes neon-flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow: 
+      0 0 4px var(--color-accent-primary),
+      0 0 11px var(--color-accent-primary),
+      0 0 19px var(--color-accent-primary),
+      0 0 40px var(--color-accent-primary),
+      0 0 80px var(--color-accent-primary);
+  }
+  
+  20%, 24%, 55% {
+    text-shadow: 
+      0 0 2px var(--color-accent-primary),
+      0 0 5px var(--color-accent-primary);
+  }
+}
+
+/* Theme-specific loader preview backgrounds */
+.theme-dark .loader-preview {
+  background: radial-gradient(circle at center, #1a2332 0%, #0f1419 100%);
+}
+
+.theme-light .loader-preview {
+  background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+}
+
+.theme-neon .loader-preview {
+  background: radial-gradient(circle at center, #1a0a1a 0%, #000000 100%);
+  border: 1px solid rgba(255, 0, 128, 0.2);
+}
+
+/* Theme-specific search input styling */
+.theme-neon .search-input {
+  border: 1px solid var(--color-accent-primary);
+  box-shadow: inset 0 0 20px rgba(255, 0, 128, 0.1);
+}
+
+.theme-neon .search-input:focus {
+  box-shadow: 
+    inset 0 0 20px rgba(255, 0, 128, 0.2),
+    0 0 20px var(--color-accent-primary);
+}
+
+/* Theme-specific modal styling */
+.theme-neon .modal-content {
+  border: 1px solid var(--color-accent-primary);
+  box-shadow: 
+    0 0 50px var(--color-accent-primary),
+    inset 0 0 30px rgba(255, 0, 128, 0.1);
+}
+
+/* Theme-specific performance monitor */
+.theme-neon .performance-monitor {
+  border: 1px solid var(--color-accent-secondary);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Auto theme based on system preference */
+@media (prefers-color-scheme: dark) {
+  body:not([class*="theme-"]) {
+    /* Apply dark theme variables when no theme is explicitly set */
+    --color-bg-primary: #0a0e1a;
+    --color-bg-secondary: #141b2e;
+    --color-bg-tertiary: #1a2332;
+    --color-bg-header: rgba(10, 14, 26, 0.95);
+    --color-bg-modal: #1a2332;
+    --color-bg-preview: #0f1419;
+    --color-bg-hover: #253347;
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-inverse: #0a0e1a;
+    --color-accent-primary: #00ff88;
+    --color-accent-secondary: #00d4ff;
+    --color-accent-hover: #00e67a;
+    --color-accent-primary-alpha: rgba(0, 255, 136, 0.2);
+    --color-border-primary: #2d3748;
+    --color-border-hover: #4a5568;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body:not([class*="theme-"]) {
+    /* Apply light theme variables when no theme is explicitly set */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f8fafc;
+    --color-bg-tertiary: #f1f5f9;
+    --color-bg-header: rgba(255, 255, 255, 0.95);
+    --color-bg-modal: #ffffff;
+    --color-bg-preview: #f9fafb;
+    --color-bg-hover: #e2e8f0;
+    --color-text-primary: #1e293b;
+    --color-text-secondary: #64748b;
+    --color-text-inverse: #ffffff;
+    --color-accent-primary: #0066cc;
+    --color-accent-secondary: #7c3aed;
+    --color-accent-hover: #0052a3;
+    --color-accent-primary-alpha: rgba(0, 102, 204, 0.1);
+    --color-border-primary: #e2e8f0;
+    --color-border-hover: #cbd5e1;
+  }
+}
+
+/* Theme persistence helper */
+body[data-theme-persistence="true"] {
+  transition: all 0.3s ease;
+}
+
+/* Custom scrollbar for dark themes */
+.theme-dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.theme-dark ::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: var(--radius-full);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* Custom scrollbar for neon theme */
+.theme-neon ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.theme-neon ::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+.theme-neon ::-webkit-scrollbar-thumb {
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 10px var(--color-accent-primary);
+}
+
+.theme-neon ::-webkit-scrollbar-thumb:hover {
+  box-shadow: 0 0 20px var(--color-accent-primary);
+}
+
+/* Firefox scrollbar styling */
+.theme-dark,
+.theme-neon {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-primary) var(--color-bg-secondary);
+}
+
+/* High contrast adjustments per theme */
+@media (prefers-contrast: high) {
+  .theme-dark {
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #cccccc;
+    --color-bg-primary: #000000;
+    --color-bg-secondary: #111111;
+    --color-border-primary: #666666;
+  }
+  
+  .theme-light {
+    --color-text-primary: #000000;
+    --color-text-secondary: #333333;
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f0f0f0;
+    --color-border-primary: #999999;
+  }
+  
+  .theme-neon {
+    --color-text-primary: #ffffff;
+    --color-accent-primary: #ff0099;
+    --color-accent-secondary: #00ffff;
+    --color-border-primary: #666666;
+  }
+}
+
+/* Reduced motion adjustments */
+@media (prefers-reduced-motion: reduce) {
+  .quantum-glow {
+    animation: none !important;
+  }
+  
+  .theme-neon .quantum-glow {
+    animation: none !important;
+  }
+  
+  .theme-dark .quantum-glow {
+    animation: none !important;
+  }
+}

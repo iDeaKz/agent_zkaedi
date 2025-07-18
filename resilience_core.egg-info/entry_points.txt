@@ -1,0 +1,2 @@
+[console_scripts]
+resilience-cli = cli:main
