@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Enhanced Quantum Loaders & Spinners Catalogue - Professional CSS animations with advanced controls">
+    <title>Quantum Loaders Catalogue</title>
+    
+    <!-- Performance optimizations -->
+    <meta name="color-scheme" content="light dark">
+    <link rel="preload" href="css/core.css" as="style">
+    <link rel="preload" href="css/themes.css" as="style">
+    <link rel="preload" href="js/core.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/loaders.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- CSS containment and GPU acceleration hints -->
+    <style>
+        .loader-preview {
+            contain: layout style paint;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+        
+        .catalogue-grid {
+            contain: layout;
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .loader-animation {
+                animation-play-state: paused !important;
+            }
+            
+            .respect-motion-preference .loader-animation {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="theme-dark" data-respect-motion="true">
+    <!-- Header -->
+    <header class="catalogue-header" role="banner">
+        <div class="container">
+            <h1 class="catalogue-title">
+                <span class="quantum-glow">Quantum Loaders</span>
+                <span class="subtitle">Professional Animation Catalogue</span>
+            </h1>
+            
+            <!-- Theme and Controls -->
+            <div class="header-controls">
+                <div class="theme-switcher" role="group" aria-label="Theme selection">
+                    <button type="button" class="theme-btn active" data-theme="dark" aria-pressed="true">
+                        <span class="sr-only">Dark theme</span>
+                        🌙
+                    </button>
+                    <button type="button" class="theme-btn" data-theme="light" aria-pressed="false">
+                        <span class="sr-only">Light theme</span>
+                        ☀️
+                    </button>
+                    <button type="button" class="theme-btn" data-theme="neon" aria-pressed="false">
+                        <span class="sr-only">Neon theme</span>
+                        ⚡
+                    </button>
+                </div>
+                
+                <div class="accessibility-controls">
+                    <button type="button" class="control-btn" id="motion-toggle" aria-pressed="false">
+                        <span class="sr-only">Toggle reduced motion</span>
+                        🎬
+                    </button>
+                    <button type="button" class="control-btn" id="help-toggle" aria-expanded="false" aria-controls="help-panel">
+                        <span class="sr-only">Help</span>
+                        ❓
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Help Panel -->
+    <aside class="help-panel" id="help-panel" aria-hidden="true" role="complementary">
+        <div class="help-content">
+            <h2>Keyboard Shortcuts</h2>
+            <dl>
+                <dt>Space</dt><dd>Play/Pause animations</dd>
+                <dt>F</dt><dd>Toggle favorites</dd>
+                <dt>E</dt><dd>Export current loader</dd>
+                <dt>1-3</dt><dd>Switch themes</dd>
+                <dt>Escape</dt><dd>Close panels</dd>
+                <dt>Tab</dt><dd>Navigate through loaders</dd>
+            </dl>
+        </div>
+    </aside>
+
+    <!-- Search and Filters -->
+    <section class="search-section" role="search">
+        <div class="container">
+            <div class="search-filters">
+                <div class="search-input-group">
+                    <label for="search-input" class="sr-only">Search loaders</label>
+                    <input type="search" 
+                           id="search-input" 
+                           class="search-input" 
+                           placeholder="Search quantum loaders..."
+                           aria-describedby="search-results-count">
+                    <button type="button" class="search-clear" aria-label="Clear search">✕</button>
+                </div>
+                
+                <div class="filter-controls">
+                    <select id="category-filter" class="filter-select" aria-label="Filter by category">
+                        <option value="">All Categories</option>
+                        <option value="quantum">Quantum Physics</option>
+                        <option value="bio">Biological</option>
+                        <option value="tech">Technology</option>
+                        <option value="space">Space & Cosmic</option>
+                        <option value="energy">Energy & Particles</option>
+                    </select>
+                    
+                    <select id="complexity-filter" class="filter-select" aria-label="Filter by complexity">
+                        <option value="">All Complexities</option>
+                        <option value="simple">Simple</option>
+                        <option value="medium">Medium</option>
+                        <option value="complex">Complex</option>
+                    </select>
+                </div>
+                
+                <div class="results-info">
+                    <span id="search-results-count" aria-live="polite">10 loaders found</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Animation Controls -->
+    <section class="global-controls" aria-label="Global animation controls">
+        <div class="container">
+            <div class="control-panel">
+                <div class="playback-controls">
+                    <button type="button" class="control-btn primary" id="global-play-pause" aria-pressed="false">
+                        <span class="btn-icon">⏸️</span>
+                        <span class="btn-text">Pause All</span>
+                    </button>
+                    <button type="button" class="control-btn" id="global-reset">
+                        <span class="btn-icon">↺</span>
+                        <span class="btn-text">Reset</span>
+                    </button>
+                </div>
+                
+                <div class="speed-control">
+                    <label for="global-speed">Speed: <span id="speed-value">1x</span></label>
+                    <input type="range" 
+                           id="global-speed" 
+                           class="speed-slider" 
+                           min="0.25" 
+                           max="3" 
+                           step="0.25" 
+                           value="1"
+                           aria-valuemin="0.25"
+                           aria-valuemax="3"
+                           aria-valuenow="1">
+                </div>
+                
+                <div class="view-controls">
+                    <button type="button" class="control-btn" id="grid-view" aria-pressed="true">
+                        <span class="sr-only">Grid view</span>
+                        ⚏
+                    </button>
+                    <button type="button" class="control-btn" id="list-view" aria-pressed="false">
+                        <span class="sr-only">List view</span>
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="catalogue-main" role="main">
+        <div class="container">
+            <!-- Favorites Section -->
+            <section class="favorites-section" id="favorites-section" style="display: none;">
+                <h2>Your Favorites</h2>
+                <div class="favorites-grid" id="favorites-grid">
+                    <!-- Favorites will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Loaders Grid -->
+            <section class="loaders-section">
+                <div class="catalogue-grid" id="loaders-grid" role="grid" aria-label="Quantum loaders collection">
+                    <!-- Loaders will be populated by JavaScript -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Loader Detail Modal -->
+    <dialog class="loader-modal" id="loader-modal" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="modal-title">Loader Details</h2>
+                <button type="button" class="modal-close" aria-label="Close modal">✕</button>
+            </header>
+            
+            <div class="modal-body">
+                <div class="modal-preview">
+                    <div class="preview-container" id="modal-preview-container">
+                        <!-- Preview will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="preview-controls">
+                        <select id="preview-background" aria-label="Preview background">
+                            <option value="transparent">Transparent</option>
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                            <option value="colored">Colored</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="modal-details">
+                    <div class="loader-info">
+                        <h3>Properties</h3>
+                        <dl class="properties-list">
+                            <dt>Category:</dt><dd id="modal-category">-</dd>
+                            <dt>Complexity:</dt><dd id="modal-complexity">-</dd>
+                            <dt>File Size:</dt><dd id="modal-size">-</dd>
+                            <dt>Browser Support:</dt><dd id="modal-support">-</dd>
+                        </dl>
+                    </div>
+                    
+                    <div class="customization-panel">
+                        <h3>Customization</h3>
+                        <div class="custom-controls">
+                            <label for="custom-size">Size: <span id="custom-size-value">50px</span></label>
+                            <input type="range" id="custom-size" min="20" max="200" value="50">
+                            
+                            <label for="custom-speed">Speed: <span id="custom-speed-value">1x</span></label>
+                            <input type="range" id="custom-speed" min="0.25" max="3" step="0.25" value="1">
+                            
+                            <label for="custom-color">Color:</label>
+                            <input type="color" id="custom-color" value="#00ff88">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer class="modal-footer">
+                <div class="modal-actions">
+                    <button type="button" class="btn secondary" id="favorite-toggle">
+                        <span class="btn-icon">♡</span>
+                        <span class="btn-text">Add to Favorites</span>
+                    </button>
+                    <button type="button" class="btn secondary" id="copy-css">
+                        <span class="btn-icon">📋</span>
+                        <span class="btn-text">Copy CSS</span>
+                    </button>
+                    <button type="button" class="btn secondary" id="copy-svg">
+                        <span class="btn-icon">🎨</span>
+                        <span class="btn-text">Copy SVG</span>
+                    </button>
+                    <button type="button" class="btn primary" id="export-loader">
+                        <span class="btn-icon">📦</span>
+                        <span class="btn-text">Export</span>
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- Code Export Modal -->
+    <dialog class="code-modal" id="code-modal" aria-labelledby="code-modal-title">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2 id="code-modal-title">Export Code</h2>
+                <button type="button" class="modal-close" aria-label="Close modal">✕</button>
+            </header>
+            
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="export-formats">
+                        <label><input type="radio" name="export-format" value="html" checked> Standalone HTML</label>
+                        <label><input type="radio" name="export-format" value="css"> CSS Only</label>
+                        <label><input type="radio" name="export-format" value="react"> React Component</label>
+                        <label><input type="radio" name="export-format" value="vue"> Vue Component</label>
+                        <label><input type="radio" name="export-format" value="angular"> Angular Component</label>
+                        <label><input type="radio" name="export-format" value="svg"> SVG Animation</label>
+                    </div>
+                </div>
+                
+                <div class="code-preview">
+                    <pre><code id="export-code-content" class="language-css"></code></pre>
+                </div>
+            </div>
+            
+            <footer class="modal-footer">
+                <button type="button" class="btn secondary" id="copy-export-code">
+                    <span class="btn-icon">📋</span>
+                    <span class="btn-text">Copy Code</span>
+                </button>
+                <button type="button" class="btn primary" id="download-export">
+                    <span class="btn-icon">⬇️</span>
+                    <span class="btn-text">Download</span>
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- Performance Monitor -->
+    <div class="performance-monitor" id="performance-monitor" style="display: none;">
+        <div class="monitor-content">
+            <div class="metric">
+                <span class="metric-label">FPS:</span>
+                <span class="metric-value" id="fps-value">60</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Memory:</span>
+                <span class="metric-value" id="memory-value">-</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">GPU:</span>
+                <span class="metric-value" id="gpu-value">Active</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="initial-loader" id="initial-loader">
+        <div class="quantum-spinner"></div>
+        <p>Initializing quantum loaders...</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/core.js"></script>
+    <script src="js/loaders-data.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/performance.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

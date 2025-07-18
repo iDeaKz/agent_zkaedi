@@ -1,0 +1,629 @@
+/* Quantum Loaders CSS Animations */
+
+/* Base loader classes */
+.loader-animation {
+  display: inline-block;
+  position: relative;
+  width: 60px;
+  height: 60px;
+  box-sizing: border-box;
+  contain: strict;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Performance optimizations */
+.loader-animation * {
+  box-sizing: border-box;
+  will-change: transform, opacity;
+}
+
+/* 1. Quantum Tunnel Loader */
+.quantum-tunnel {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.quantum-tunnel::before,
+.quantum-tunnel::after {
+  content: '';
+  position: absolute;
+  border: 2px solid var(--color-accent-primary);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: tunnel-expand 2s linear infinite;
+}
+
+.quantum-tunnel::after {
+  animation-delay: -1s;
+  border-color: var(--color-accent-secondary);
+}
+
+@keyframes tunnel-expand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+  }
+}
+
+/* 2. DNA Sequencer */
+.dna-sequencer {
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
+
+.dna-sequencer::before,
+.dna-sequencer::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 60px;
+  background: linear-gradient(to bottom, 
+    var(--color-accent-primary) 0%, 
+    transparent 50%, 
+    var(--color-accent-secondary) 100%);
+  left: 50%;
+  transform: translateX(-50%);
+  animation: dna-twist 2s ease-in-out infinite;
+}
+
+.dna-sequencer::after {
+  animation-delay: -1s;
+  transform: translateX(-50%) rotateY(90deg);
+}
+
+.dna-sequencer .dna-base {
+  position: absolute;
+  width: 20px;
+  height: 2px;
+  background: var(--color-accent-primary);
+  left: 50%;
+  transform: translateX(-50%);
+  animation: dna-base-pulse 1s ease-in-out infinite;
+}
+
+.dna-sequencer .dna-base:nth-child(1) { top: 10px; animation-delay: 0s; }
+.dna-sequencer .dna-base:nth-child(2) { top: 25px; animation-delay: 0.2s; }
+.dna-sequencer .dna-base:nth-child(3) { top: 40px; animation-delay: 0.4s; }
+
+@keyframes dna-twist {
+  0%, 100% { transform: translateX(-50%) rotateX(0deg); }
+  50% { transform: translateX(-50%) rotateX(180deg); }
+}
+
+@keyframes dna-base-pulse {
+  0%, 100% { opacity: 0.3; width: 15px; }
+  50% { opacity: 1; width: 25px; }
+}
+
+/* 3. Holographic Cube */
+.holographic-cube {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cube-rotate 3s linear infinite;
+  margin: 5px;
+}
+
+.holographic-cube .face {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border: 1px solid var(--color-accent-primary);
+  background: linear-gradient(45deg, 
+    rgba(0, 255, 136, 0.1) 0%, 
+    rgba(0, 212, 255, 0.1) 100%);
+  backdrop-filter: blur(1px);
+}
+
+.holographic-cube .face.front { transform: translateZ(25px); }
+.holographic-cube .face.back { transform: translateZ(-25px) rotateY(180deg); }
+.holographic-cube .face.right { transform: rotateY(90deg) translateZ(25px); }
+.holographic-cube .face.left { transform: rotateY(-90deg) translateZ(25px); }
+.holographic-cube .face.top { transform: rotateX(90deg) translateZ(25px); }
+.holographic-cube .face.bottom { transform: rotateX(-90deg) translateZ(25px); }
+
+@keyframes cube-rotate {
+  0% { transform: rotateX(0) rotateY(0); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+/* 4. Energy Sphere */
+.energy-sphere {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, 
+    var(--color-accent-primary) 0%, 
+    transparent 70%);
+  animation: sphere-pulse 2s ease-in-out infinite;
+}
+
+.energy-sphere::before,
+.energy-sphere::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-secondary);
+  border-top-color: transparent;
+  border-right-color: transparent;
+  animation: energy-ring 1.5s linear infinite;
+}
+
+.energy-sphere::after {
+  animation-direction: reverse;
+  animation-duration: 2.2s;
+  border-color: var(--color-accent-primary);
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
+@keyframes sphere-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px var(--color-accent-primary);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 40px var(--color-accent-primary), 0 0 60px var(--color-accent-secondary);
+    transform: scale(1.1);
+  }
+}
+
+@keyframes energy-ring {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 5. Particle Accelerator */
+.particle-accelerator {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  border: 2px solid var(--color-accent-primary);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.particle-accelerator .particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--color-accent-secondary);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: particle-orbit 1s linear infinite;
+  box-shadow: 0 0 10px var(--color-accent-secondary);
+}
+
+.particle-accelerator .particle:nth-child(1) { animation-delay: 0s; }
+.particle-accelerator .particle:nth-child(2) { animation-delay: -0.33s; }
+.particle-accelerator .particle:nth-child(3) { animation-delay: -0.66s; }
+
+@keyframes particle-orbit {
+  0% { 
+    transform: translate(-50%, -50%) rotate(0deg) translateX(25px) rotate(0deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: translate(-50%, -50%) rotate(360deg) translateX(25px) rotate(-360deg);
+    opacity: 1;
+  }
+}
+
+/* 6. Quantum Gate Circuit */
+.quantum-gate {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantum-gate .gate-line {
+  position: absolute;
+  width: 50px;
+  height: 2px;
+  background: var(--color-accent-primary);
+  animation: gate-pulse 1.5s ease-in-out infinite;
+}
+
+.quantum-gate .gate-line:nth-child(1) { top: 15px; animation-delay: 0s; }
+.quantum-gate .gate-line:nth-child(2) { top: 30px; animation-delay: 0.3s; }
+.quantum-gate .gate-line:nth-child(3) { top: 45px; animation-delay: 0.6s; }
+
+.quantum-gate .quantum-bit {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent-secondary);
+  border-radius: 50%;
+  animation: bit-travel 2s linear infinite;
+}
+
+.quantum-gate .quantum-bit:nth-child(4) { top: 11px; left: 0; }
+.quantum-gate .quantum-bit:nth-child(5) { top: 26px; left: 0; animation-delay: -0.5s; }
+.quantum-gate .quantum-bit:nth-child(6) { top: 41px; left: 0; animation-delay: -1s; }
+
+@keyframes gate-pulse {
+  0%, 100% { opacity: 0.5; box-shadow: none; }
+  50% { opacity: 1; box-shadow: 0 0 10px var(--color-accent-primary); }
+}
+
+@keyframes bit-travel {
+  0% { left: 0; opacity: 1; }
+  100% { left: 52px; opacity: 0; }
+}
+
+/* 7. Electromagnetic Field */
+.electromagnetic-field {
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
+
+.electromagnetic-field .field-line {
+  position: absolute;
+  border: 1px solid var(--color-accent-primary);
+  border-radius: 50%;
+  animation: field-expand 2s ease-out infinite;
+}
+
+.electromagnetic-field .field-line:nth-child(1) {
+  top: 25px;
+  left: 25px;
+  width: 10px;
+  height: 10px;
+  animation-delay: 0s;
+}
+
+.electromagnetic-field .field-line:nth-child(2) {
+  top: 20px;
+  left: 20px;
+  width: 20px;
+  height: 20px;
+  animation-delay: -0.4s;
+}
+
+.electromagnetic-field .field-line:nth-child(3) {
+  top: 15px;
+  left: 15px;
+  width: 30px;
+  height: 30px;
+  animation-delay: -0.8s;
+}
+
+.electromagnetic-field .field-line:nth-child(4) {
+  top: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  animation-delay: -1.2s;
+}
+
+@keyframes field-expand {
+  0% {
+    opacity: 1;
+    transform: scale(0.5);
+    border-color: var(--color-accent-primary);
+  }
+  50% {
+    border-color: var(--color-accent-secondary);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+    border-color: var(--color-accent-primary);
+  }
+}
+
+/* 8. Plasma Storm */
+.plasma-storm {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, 
+    rgba(255, 0, 128, 0.2) 0%, 
+    transparent 70%);
+}
+
+.plasma-storm .lightning {
+  position: absolute;
+  width: 2px;
+  height: 60px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    var(--color-accent-primary) 20%, 
+    var(--color-accent-secondary) 80%, 
+    transparent 100%);
+  animation: lightning-strike 0.8s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.plasma-storm .lightning:nth-child(1) {
+  left: 15px;
+  animation-delay: 0s;
+  transform: rotate(15deg);
+}
+
+.plasma-storm .lightning:nth-child(2) {
+  left: 30px;
+  animation-delay: 0.2s;
+  transform: rotate(-10deg);
+}
+
+.plasma-storm .lightning:nth-child(3) {
+  left: 45px;
+  animation-delay: 0.4s;
+  transform: rotate(20deg);
+}
+
+@keyframes lightning-strike {
+  0%, 90%, 100% { opacity: 0; }
+  10%, 80% { opacity: 1; }
+  20%, 70% { opacity: 0.5; }
+  30%, 60% { opacity: 1; }
+  40%, 50% { opacity: 0.8; }
+}
+
+/* 9. Dark Matter Vortex */
+.dark-matter-vortex {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, 
+    transparent 0deg, 
+    var(--color-accent-primary) 90deg, 
+    transparent 180deg, 
+    var(--color-accent-secondary) 270deg, 
+    transparent 360deg);
+  animation: vortex-spin 2s linear infinite;
+}
+
+.dark-matter-vortex::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-accent-primary);
+  animation: vortex-inner 1.5s linear infinite reverse;
+}
+
+.dark-matter-vortex::after {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, 
+    var(--color-accent-secondary) 0%, 
+    transparent 70%);
+  animation: vortex-core 1s ease-in-out infinite;
+}
+
+@keyframes vortex-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes vortex-inner {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(-360deg) scale(1.1); }
+}
+
+@keyframes vortex-core {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 10. Singularity Collapse */
+.singularity-collapse {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.singularity-collapse .matter-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--color-accent-primary);
+  border-radius: 50%;
+  animation: collapse-inward 3s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--color-accent-primary);
+}
+
+.singularity-collapse .matter-particle:nth-child(1) {
+  top: 0;
+  left: 50%;
+  animation-delay: 0s;
+}
+
+.singularity-collapse .matter-particle:nth-child(2) {
+  top: 14px;
+  right: 0;
+  animation-delay: 0.2s;
+}
+
+.singularity-collapse .matter-particle:nth-child(3) {
+  bottom: 14px;
+  right: 0;
+  animation-delay: 0.4s;
+}
+
+.singularity-collapse .matter-particle:nth-child(4) {
+  bottom: 0;
+  left: 50%;
+  animation-delay: 0.6s;
+}
+
+.singularity-collapse .matter-particle:nth-child(5) {
+  bottom: 14px;
+  left: 0;
+  animation-delay: 0.8s;
+}
+
+.singularity-collapse .matter-particle:nth-child(6) {
+  top: 14px;
+  left: 0;
+  animation-delay: 1s;
+}
+
+.singularity-collapse::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent-secondary);
+  border-radius: 50%;
+  animation: singularity-pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 20px var(--color-accent-secondary);
+}
+
+@keyframes collapse-inward {
+  0% { 
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  70% { 
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes singularity-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 20px var(--color-accent-secondary);
+  }
+  50% { 
+    transform: scale(1.5);
+    box-shadow: 0 0 40px var(--color-accent-secondary), 0 0 60px var(--color-accent-primary);
+  }
+}
+
+/* Speed control classes */
+.speed-0-25 { animation-duration: calc(var(--base-duration, 2s) * 4) !important; }
+.speed-0-5 { animation-duration: calc(var(--base-duration, 2s) * 2) !important; }
+.speed-0-75 { animation-duration: calc(var(--base-duration, 2s) * 1.33) !important; }
+.speed-1 { animation-duration: var(--base-duration, 2s) !important; }
+.speed-1-25 { animation-duration: calc(var(--base-duration, 2s) * 0.8) !important; }
+.speed-1-5 { animation-duration: calc(var(--base-duration, 2s) * 0.67) !important; }
+.speed-1-75 { animation-duration: calc(var(--base-duration, 2s) * 0.57) !important; }
+.speed-2 { animation-duration: calc(var(--base-duration, 2s) * 0.5) !important; }
+.speed-2-5 { animation-duration: calc(var(--base-duration, 2s) * 0.4) !important; }
+.speed-3 { animation-duration: calc(var(--base-duration, 2s) * 0.33) !important; }
+
+/* Paused state */
+.animation-paused .loader-animation,
+.animation-paused .loader-animation *,
+.animation-paused .loader-animation::before,
+.animation-paused .loader-animation::after {
+  animation-play-state: paused !important;
+}
+
+/* Size variations */
+.loader-size-small { 
+  width: 30px; 
+  height: 30px; 
+  transform: scale(0.5);
+}
+
+.loader-size-medium { 
+  width: 60px; 
+  height: 60px; 
+  transform: scale(1);
+}
+
+.loader-size-large { 
+  width: 90px; 
+  height: 90px; 
+  transform: scale(1.5);
+}
+
+.loader-size-xlarge { 
+  width: 120px; 
+  height: 120px; 
+  transform: scale(2);
+}
+
+/* Custom color support */
+.loader-animation[data-color] {
+  --color-accent-primary: var(--custom-color, #00ff88);
+  --color-accent-secondary: var(--custom-color-secondary, #00d4ff);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .loader-animation,
+  .loader-animation *,
+  .loader-animation::before,
+  .loader-animation::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .respect-motion-preference .loader-animation,
+  .respect-motion-preference .loader-animation *,
+  .respect-motion-preference .loader-animation::before,
+  .respect-motion-preference .loader-animation::after {
+    animation: none !important;
+  }
+}
+
+/* GPU acceleration hints */
+.loader-animation,
+.loader-animation *,
+.loader-animation::before,
+.loader-animation::after {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Performance optimizations for complex loaders */
+.holographic-cube {
+  perspective: 200px;
+}
+
+.dark-matter-vortex {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.particle-accelerator {
+  isolation: isolate;
+}
+
+/* Containment optimizations */
+.loader-animation {
+  contain: layout style paint;
+}
